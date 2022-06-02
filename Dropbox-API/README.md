@@ -13,4 +13,4 @@ Please note, that there is so much you could do using the dropbox API but for no
 
 ---
 
-Feel free to reach out **preetparmar@outlook.com** and also check out my [profile](https://preetparmar.github.io)
+I have also written an article about this project, feel free to give that a read [here](https://blog.preetparmar.com/dropbox-api-automating-dropbox-downloads-using-python/).
