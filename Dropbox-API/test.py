@@ -6,6 +6,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 access_token = config['LOGIN']['access_token']
+long_term_access_token = config['LOGIN']['long_term_access_token']
 
 """ Connecting to dropbox """
 # Importing Library
@@ -14,7 +15,7 @@ from dropbox.exceptions import AuthError
 
 # Connecting to dropbox
 try:
-    dbx = dropbox.Dropbox(access_token)
+    dbx = dropbox.Dropbox(long_term_access_token)
 except AuthError as e:
     print(f'Error connecting to Dropbox using the access token: {e}')
 
@@ -48,3 +49,31 @@ for name, path in zip(df.loc[:, 'name'], df.loc[:, 'path_display']):
             metadata, result = dbx.files_download(path)
             with open(f'{local_folder_path}/{name}', 'wb') as f:
                 f.write(result.content)
+
+""" Testing new oAuth """
+import dropbox
+import configparser
+from dropbox import DropboxOAuth2FlowNoRedirect
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+APP_KEY = config['LOGIN']['app_key']
+APP_SECRET = config['LOGIN']['app_secret']
+lt_access_token = config['LOGIN']['long_term_access_token']
+
+auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, APP_SECRET)
+auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, use_pkce=True, token_access_type='offline')
+
+authorize_url = auth_flow.start()
+
+lt_access_token.strip()
+
+
+print(f'Go to: {authorize_url}')
+
+try:
+    oauth_result = auth_flow.finish(lt_access_token.strip())
+except Exception as e:
+    print(f'Error: {e}')
+

@@ -4,6 +4,7 @@ from os import listdir
 import pandas as pd
 import configparser
 from dropbox.exceptions import AuthError
+from dropbox import DropboxOAuth2FlowNoRedirect
 
 # Variable
 DROPBOX_FOLDER_PATH = '/Apps/SpendingTracker/Exports'
@@ -15,16 +16,28 @@ local_files = listdir(LOCAL_FOLDER_PATH)
 # Getting the access token
 config = configparser.ConfigParser()
 config.read('config.ini')
-access_token = config['LOGIN']['access_token']
+# access_token = config['LOGIN']['access_token']
+APP_KEY = config['LOGIN']['app_key']
+APP_SECRET = config['LOGIN']['app_secret']
 
 # Initializing Dropbox API
-def dropbox_connect():
+def dropbox_connect(key=APP_KEY, secret=APP_SECRET):
     """Create a connection to Dropbox."""
+    auth_flow = DropboxOAuth2FlowNoRedirect(key, secret)
+    authorize_url = auth_flow.start()
+    print("1. Go to: " + authorize_url)
+    print("2. Click \"Allow\" (you might have to log in first).")
+    print("3. Copy the authorization code.")
+    auth_code = input("Enter the authorization code here: ").strip()
 
     try:
-        dbx = dropbox.Dropbox(access_token)
-    except AuthError as e:
-        print('Error connecting to Dropbox with access token: ' + str(e))
+        oauth_result = auth_flow.finish(auth_code)
+        # dbx = dropbox.Dropbox(long_term_access_token)
+        dbx = dropbox.Dropbox(oauth2_access_token=oauth_result.access_token)
+    except Exception as e:
+        print('Error: %s' % (e,))
+        exit(1)
+
     return dbx
 
 def dropbox_list_files():
@@ -50,7 +63,6 @@ def dropbox_list_files():
 
     except Exception as e:
         print('Error getting list of files from Dropbox: ' + str(e))
-
 
 def dropbox_download_and_save_files():
     """ Downloads and saves the files which don't already exist locally """
