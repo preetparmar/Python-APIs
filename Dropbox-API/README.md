@@ -1,4 +1,4 @@
-# Kaggle-API
+# Dropbox API
 
 An API to get files from dropbox. I have referred to the official dropbox API, you can find the link [here](https://www.dropbox.com/developers/documentation/python)
 
